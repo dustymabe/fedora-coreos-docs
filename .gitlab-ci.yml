@@ -4,7 +4,7 @@ pages:
   stage: deploy
   interruptible: true
   script:
-  - antora --fetch --redirect-facility=gitlab --to-dir=public antora-playbook.yml
+  - antora --fetch --redirect-facility=gitlab --to-dir=public site.yml
   artifacts:
     paths:
     - public
