@@ -25,9 +25,7 @@ For more information on configuration, refer to the documentation for xref:build
 include::getting-started-container.adoc[]
 
 However, it is more interesting to make a custom derived container image, and
-run it.
-
-xref:building-containers.adoc[Building derived container images]
+run it.  See xref:building-containers.adoc[Building derived container images].
 
 === Booting on a local hypervisor
 
