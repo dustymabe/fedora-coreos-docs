@@ -32,3 +32,9 @@ https://systemd.io/USER_RECORD/[JSON user records] for users is preferred.
 == Upstream bootc user/group recommendations
 
 For more, see https://containers.github.io/bootc/building/users-and-groups.html[bootc generic user/group guidance].
+
+=== The osbuild-cfg project
+
+TIP: The https://github.com/cgwalters/osbuild-cfg[osbuild-cfg] project is aiming
+to create a fully declarative interface for a subset of operating
+system configuration tasks, and includes support for SSH keys for root.

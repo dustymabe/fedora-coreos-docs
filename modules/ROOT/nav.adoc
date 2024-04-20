@@ -22,10 +22,10 @@
 ** xref:counting.adoc[Node counting]
 * OS updates
 ** xref:auto-updates.adoc[Auto-Updates]
+** xref:disconnected-updates.adoc[Disconnected/offline updates]
 ** xref:bootloader-updates.adoc[Bootloader Updates]
 * Troubleshooting
 ** xref:manual-rollbacks.adoc[Manual Rollbacks]
 ** xref:access-recovery.adoc[Access Recovery]
-* Reference pages
 * Projects documentation
 ** https://github.com/containers/bootc[bootc]
