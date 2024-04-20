@@ -3,6 +3,7 @@
 ** xref:base-images.adoc[Base images]
 * Building containers
 ** xref:building-containers.adoc[Building derived container images]
+** xref:building-custom-base.adoc[Building custom base images]
 * Provisioning machines
 ** xref:bare-metal.adoc[Installing on Bare Metal]
 ** xref:provisioning-aws.adoc[Installing on AWS]

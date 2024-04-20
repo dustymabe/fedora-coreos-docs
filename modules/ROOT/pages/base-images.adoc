@@ -49,3 +49,5 @@ derived builds.
 
 For example, on Amazon Web Services, you may want to install `cloud-init`; but this
 is also not required.
+
+See xref:cloud-agents.adoc[Cloud agents] for more information.

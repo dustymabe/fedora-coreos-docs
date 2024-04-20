@@ -1,0 +1,31 @@
+= Custom Fedora bootc base container images
+
+At the current time, there is significant internal usage
+of the https://ostreedev.github.io/[OSTree] technology
+included as part of the base images.  This is slated
+to change over time, see https://containers.github.io/bootc/bootc-images.html[bootc base images]
+as well as https://github.com/containers/bootc/pull/215[bootc PR 215]
+which will make it much, much easier to supply custom arbitrary
+content.
+
+== Forking the existing source
+
+The source definitions to the base images are fully open, you
+are welcome to fork them.  See the linked source code for more
+details.  However, the current build process is somewhat special
+and not highly suited for deep customization.
+
+Note that there is a not-small set of significant details
+in the build process and forking will mean losing out
+on important changes to the existing base images.
+
+== Forking the experimental "container-native" base sources
+
+There is a new https://gitlab.com/bootc-org/fedora-bootc/base-images-experimental[Base Image (Experimental)] build
+git repository which is much more "container native" and should
+with some more work be better suited for a model where it is
+e.g. used as a git submodule or equivalent.
+
+It's much easier to inject arbitrary code in the middle
+of the build process with this base source, without
+significant restrictions.
