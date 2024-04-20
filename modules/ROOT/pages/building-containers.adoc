@@ -17,7 +17,6 @@ for the base OS are tightly bound.  Systems which update
 one or the other asynchronously often lead to problems with
 skew.
 
-
 === Containerized vs 1:1 host:app
 
 A webserver is the classic case of something that can be run
@@ -68,3 +67,8 @@ Many configuration changes to a Linux system boil down effectively to
 writing configuration files into `/etc` or `/usr` - those operations
 translate seamlessly into booted hosts via a `COPY` instruction
 or similar in a container build.
+
+== More examples
+
+See https://gitlab.com/bootc-org/examples[Examples] for many examples of
+container image definitions!
