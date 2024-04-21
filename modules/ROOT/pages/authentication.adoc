@@ -9,7 +9,7 @@ hardcoded credentials (passwords or SSH keys).
 
 === Embedding a default SSH key for the `root` user in a derived container
 
-include::embedding-container-ssh-root.adoc[]
+include::embedding-container-root-ssh.adoc[]
 
 == Creating a New User
 
