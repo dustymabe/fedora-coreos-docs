@@ -59,9 +59,13 @@ COPY index.html /usr/share/www/html
 EXPOSE 80
 ----
 
-== Injecting authentication credentials into container builds
+== Injecting a root SSH public key into container builds
 
+include::embedding-container-root-ssh.adoc[]
 
+=== More information about authentication, users and groups
+
+See xref:authentication.adoc[Authentication, Users, and Groups].
 
 == General configuration guidance
 

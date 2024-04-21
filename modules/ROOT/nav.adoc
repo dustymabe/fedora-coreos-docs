@@ -9,6 +9,7 @@
 ** xref:podman-bootc-cli.adoc[Using podman-bootc-cli]
 ** xref:qemu-and-libvirt.adoc[Using qemu and libvirt]
 ** xref:provisioning-aws.adoc[Installing on AWS]
+** xref:provisioning-vsphere.adoc[Installing on vSphere]
 * System Configuration
 ** xref:authentication.adoc[Authentication, Users and Groups]
 ** xref:storage.adoc[Configuring Storage]

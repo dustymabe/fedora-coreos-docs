@@ -1,0 +1,8 @@
+:page-partial:
+
+IMPORTANT: Unlike Fedora Cloud or Fedora CoreOS (or in general many pre-generated disk
+images) the default base image does *not* include a tool such as https://cloud-init.io/[cloud-init]
+or https://github.com/coreos/afterburn/[afterburn] to fetch SSH keys
+or execute scripts from the hypervisor.
+
+For more on this, see xref:cloud-agents.adoc[Cloud Agents].

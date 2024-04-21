@@ -13,10 +13,7 @@ The examples below use the https://aws.amazon.com/cli/[aws] command-line tool, w
 
 == No cloud-init or hypervisor-specific metadata tools included by default
 
-It is important to understand that unlike Fedora Cloud or Fedora CoreOS,
-the default system does *not* include a tool such as https://cloud-init.io/[cloud-init]
-or https://github.com/coreos/afterburn/[afterburn] to fetch SSH keys
-or execute scripts from the hypervisor.
+include::cloud-agents-note.adoc[]
 
 == No separate pre-generated AMIs
 
