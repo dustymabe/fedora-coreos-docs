@@ -10,6 +10,7 @@
 ** xref:provisioning-aws.adoc[Installing on AWS]
 ** xref:provisioning-vsphere.adoc[Installing on vSphere]
 ** xref:provisioning-gcp.adoc[Installing on GCP (via OpenTofu)]
+** xref:linux-desktops.adoc[Linux desktops]
 * System Configuration
 ** xref:authentication.adoc[Authentication, Users and Groups]
 ** xref:storage.adoc[Configuring Storage]
