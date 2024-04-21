@@ -6,9 +6,11 @@
 ** xref:building-custom-base.adoc[Building custom base images]
 * Provisioning machines
 ** xref:bare-metal.adoc[Installing on Bare Metal]
+** xref:podman-bootc-cli.adoc[Using podman-bootc-cli]
+** xref:qemu-and-libvirt.adoc[Using qemu and libvirt]
 ** xref:provisioning-aws.adoc[Installing on AWS]
 * System Configuration
-** xref:authentication.adoc[Configuring Users and Groups]
+** xref:authentication.adoc[Authentication, Users and Groups]
 ** xref:storage.adoc[Configuring Storage]
 ** xref:sysconfig-network-configuration.adoc[Network Configuration]
 ** xref:running-containers.adoc[Running Containers]

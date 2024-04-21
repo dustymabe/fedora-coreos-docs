@@ -1,19 +1,92 @@
-= Configuring Users
+= Authentication, Users and Groups
 
-== Default User
+== Default Users and credentials
 
 There are no default interactive users other than `root` in the base image.
+
+In the default `full` base image, OpenSSH is running; but there are no
+hardcoded credentials (passwords or SSH keys).
+
+=== Embedding a default SSH key for the `root` user in a derived container
+
+See https://gitlab.com/bootc-org/examples/-/tree/main/included-ssh-pubkey[examples/included-ssh-pubkey]
+for the canonical reference.  Here is a copy for convenience:
+
+[source]
+----
+FROM <baseimage>
+# You *must* specify this argument; it is a SSH public key
+# (in general an authorized_keys formatted data)
+# that will be used for the `root` user by default.
+ARG SSHPUBKEY
+# In this example, we add /usr/ssh to the search path OpenSSH uses for keys.
+# The rationale for this is that `/usr` is always part of the immutable
+# container state, as opposed to user home directories which are mutable.
+# In this pattern, you can always have a "fallback" key available, but
+# e.g. use an external system (such as cloud-init) to live-update
+# the traditional authorized_keys in the user's home directories.
+RUN set -eu; mkdir -p /usr/ssh && \
+    echo 'AuthorizedKeysFile /usr/ssh/%u.keys .ssh/authorized_keys .ssh/authorized_keys2' >> /etc/ssh/sshd_config.d/30-auth-system.conf && \
+    echo ${SSHPUBKEY} > /usr/ssh/root.keys && chmod 0600 /usr/ssh/root.keys
+----
+
+Provide your public SSH key as a build argument:
+
+[source]
+----
+$ podman build --build-arg=SSHPUBKEY=$HOME/.ssh/id_rsa.pub .
+----
 
 == Creating a New User
 
 There are multiple mechanisms to create unprivileged users.
 
-=== Local interactive users
+
+=== Machine local interactive users
 
 When installing via Anaconda, or when injecting a bootc-image-builder `config.json`,
 or if tooling like `cloud-init` is in use, or in general anything that ultimately
 invokes `useradd` at runtime on the target system, these users become
 "local mutable state", with entries in `/etc/passwd` and `/var/home/$user`.
+
+==== Anaconda
+
+This kickstart fragment will inject a SSH key for the root user:
+
+[source]
+----
+rootpw --iscrypted locked
+sshkey --username root "<your key here>"
+----
+
+NOTE: The need for the `rootpw` is a bug/misdesign in Anaconda that will be fixed in the future.  The default
+root password defaults to being locked already.
+
+==== bootc-image-builder
+
+Similar to kickstart authentication, the bootc-image-builder project for generating
+disk images supports a `config.json`.  For more information, see https://github.com/osbuild/bootc-image-builder?tab=readme-ov-file#-build-config[the bootc-image-builder docs].
+
+Inline example:
+
+[source]
+----
+{
+  "blueprint": {
+    "customizations": {
+      "user": [
+        {
+          "name": "alice",
+          "key": "ssh-rsa AAA ... user@email.com",
+          "groups": [
+            "wheel"
+          ]
+        }
+      ]
+    }
+  }
+}
+----
 
 === Local system users
 

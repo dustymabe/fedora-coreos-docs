@@ -29,7 +29,7 @@ run it.  See xref:building-containers.adoc[Building derived container images].
 
 === Booting on a local hypervisor
 
-include::getting-started-local-virt.adoc[]
+include::getting-started-podman-bootc-cli.adoc[Using podman-bootc-cli]
 
 === Using Podman Desktop with the bootc extension
 

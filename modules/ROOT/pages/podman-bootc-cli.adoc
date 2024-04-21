@@ -1,0 +1,24 @@
+= Provisioning Fedora bootc locally with podman-bootc-cli
+
+include::getting-started-podman-bootc-cli.adoc[]
+
+== Understanding authentication
+
+The `podman-bootc-cli` tool streamlines logging into the generated
+disk images by injecting a default SSH key for the `root` user
+via https://systemd.io/CREDENTIALS/[systemd credentials] passed
+to the hypervisor, and further automatically invoking `ssh` to
+get an interactive shell.
+
+This maximizes convenience for testing locally, while supporting
+a container image that is intended to be deployed via e.g.
+Anaconda and e.g. a kickstart-provided SSH key to bare metal.
+
+Or, you may be creating a container image that is intended
+to run via a fully https://about.gitlab.com/topics/gitops/["git-ops"]
+fashion where it is not allowed to SSH in at all for production
+scenarios.  This can be done by simply not including any
+SSH keys in your container image or disk image generation phases,
+but the `podman-bootc` CLI helps inject a key for local
+development/testing scenarios.
+

@@ -59,6 +59,10 @@ COPY index.html /usr/share/www/html
 EXPOSE 80
 ----
 
+== Injecting authentication credentials into container builds
+
+
+
 == General configuration guidance
 
 See the https://containers.github.io/bootc/building/guidance.html[bootc upstream guidance].
