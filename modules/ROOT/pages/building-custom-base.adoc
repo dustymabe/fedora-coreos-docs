@@ -1,8 +1,15 @@
 = Custom Fedora bootc base container images
 
-At the current time, there is significant internal usage
+The goal eventually is to support a workflow like this:
+
+```
+FROM quay.io/fedora/fedora:40
+RUN dnf -y install kernel bootc
+```
+
+However, at the current time, there is significant internal usage
 of the https://ostreedev.github.io/[OSTree] technology
-included as part of the base images.  This is slated
+included and *required* in the base images.  This is slated
 to change over time, see https://containers.github.io/bootc/bootc-images.html[bootc base images]
 as well as https://github.com/containers/bootc/pull/215[bootc PR 215]
 which will make it much, much easier to supply custom arbitrary
