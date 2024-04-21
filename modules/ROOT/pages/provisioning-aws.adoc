@@ -44,9 +44,9 @@ which fetch your target container that install itself to the target root.
 
 Then on reboot, your system has been replaced with the container image content.
 
+Save the following file as e.g. `run-bootc-install`:
 [source,text]
 ----
-# run-bootc-install
 #!/bin/bash 
 dnf -y install podman
 podman run --rm --privileged -v /dev:/dev -v /var/lib/containers:/var/lib/containers -v /:/target \
@@ -58,8 +58,8 @@ podman run --rm --privileged -v /dev:/dev -v /var/lib/containers:/var/lib/contai
 Replace `<image>` with your container image in this text file.
 
 NOTE: The default base image does not include `cloud-init`; so any keys fetched
-from the instance metadata will not by default be re-applied.  As the `bootc`
-documentation notes, there is special case support for injecting a SSH key
+from the instance metadata will not by default be re-applied on the subsequent boot. 
+As the `bootc` documentation notes, there is special case support for injecting a SSH key
 from the initial running system.
 
 To do this, add `--root-ssh-authorized-keys /target/root/.ssh/authorized_keys`
@@ -73,7 +73,7 @@ system.
 ----
 NAME='instance1'
 SSHKEY='my-key'     # optional: the name of your SSH key: `aws ec2 describe-key-pairs`
-IMAGE='ami-xxx'     # the AMI ID found on the download page
+IMAGE='ami-xxx'     # the AMI ID as used by e.g. https://fedoraproject.org/cloud/download or https://www.centos.org/download/aws-images/
 DISK='20'           # the size of the hard disk
 REGION='us-east-1'  # the target region
 TYPE='m5.large'     # the instance type
@@ -100,3 +100,12 @@ upstream site.  Conceptually, the tool takes as input a bootc container image, a
 images such as AMIs and also help upload them to cloud infrastructure.
 
 Additionally, "static" configuration can be injected as part of the disk image.
+
+Once you have generated an AMI, *subsequent* operating system changes can be made
+by just building and pushing a new container image to the registry; any existing
+instances will fetch updates from it automatically and synchronize to that state.
+Hence, you do not need to produce a new AMI for every container image change.
+
+A generally useful pattern is to only produce new AMIs periodically, when you
+want to ensure that newly provisioned instances boot directly into the latest
+container image state.
