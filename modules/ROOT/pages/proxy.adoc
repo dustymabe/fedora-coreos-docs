@@ -1,0 +1,38 @@
+= Proxied Internet Access
+
+If you are deploying to an environment requiring internet access via a proxy, you will want to configure services so that they can access resources as intended.
+
+This is best done by defining a single file with required environment variables in your configuration, and to reference this via systemd drop-in unit files for all such services.
+
+== Defining common proxy environment variables
+
+This common file has to be subsequently referenced explicitly by each service that requires internet access.
+
+[source,yaml]
+----
+# /etc/example-proxy.env
+https_proxy="http://example.com:8080"
+all_proxy="http://example.com:8080"
+http_proxy="http://example.com:8080"
+HTTP_PROXY="http://example.com:8080"
+HTTPS_PROXY="http://example.com:8080"
+no_proxy="*.example.com,127.0.0.1,0.0.0.0,localhost"
+----
+
+== Defining drop-in units for core services
+
+The `bootc` and `podman` tools will commonly need proxy configuration.  At the
+current time, `bootc` does not always run as a systemd unit.
+
+[source,yaml,subs="attributes"]
+----
+# /usr/lib/systemd/system/bootc-fetch-apply-updates.service.d/99-proxy.conf
+[Service]
+EnvironmentFile=/etc/example-proxy.env
+----
+
+== Defining proxy use for podman systemd units
+
+Using the 
+https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html[Podman systemd] configuration,
+similarly add `EnvironmentFile=/etc/example-proxy.env`.

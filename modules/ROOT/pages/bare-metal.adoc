@@ -1,0 +1,98 @@
+= Installing Fedora bootc on Bare Metal
+
+This guide provides instructions to install Fedora bootc to bare metal.
+Three main options are available:
+
+* Installing from a stock Anaconda ISO/PXE over the network
+* Installing from a bootc-image-builder generated ISO
+* Installing from the container directly with `bootc install`
+
+== Prerequisites
+
+Before installing Fedora bootc, it's recommended that you have created a customized derived container image;
+but this is not a hard requirement, as it is possible to enable basic system access via
+e.g. injecting SSH keys with kickstart or with `bootc install` and the `-root-ssh-authorized-keys`
+argument.
+
+=== Using Anaconda
+
+Fedora bootc can be installed using https://anaconda-installer.readthedocs.io/en/latest/[Anaconda].
+
+==== Installing from the network
+
+The `ostreecontainer` kickstart verb can be used to provision your custom container image.
+
+<https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreecontainer>
+
+This is a full basic Kickstart example:
+
+.basic.ks
+[source]
+----
+# Basic setup
+text
+network --bootproto=dhcp --device=link --activate
+# Basic partitioning
+clearpart --all --initlabel --disklabel=gpt
+reqpart --add-boot
+part / --grow --fstype xfs
+
+# Here's where we reference the container image to install - notice the kickstart
+# has no `%packages` section!  What's being installed here is a container image.
+ostreecontainer --url quay.io/centos-bootc/centos-bootc:stream9
+
+firewall --disabled
+services --enabled=sshd
+
+# Only inject a SSH key for root
+rootpw --iscrypted locked
+sshkey --username root "<your key here>"
+reboot
+----
+
+==== Generating a custom installer ISO with bootc-image-builder
+
+See the https://github.com/osbuild/bootc-image-builder?tab=readme-ov-file#-image-types[bootc-image-builder documentation];
+the key is usage of the `anaconda-iso` type.
+
+Conceptually, this generates a system close to the "stock" ISOs available
+from Fedora/CentOS, except your container image content is embedded in
+the ISO.  This means that there is no need to access the network
+during installation.
+
+For example, you can copy the ISO to a USB stick, and take it into
+an air-gapped/disconnected environment and perform a bare metal installation.
+
+=== Using `bootc install`
+
+A key goal of the `bootc` project is having the container image be
+the "source of truth" as much as possible.  A "basic" installer
+is built into the `bootc` project and is available as `bootc install to-disk`
+or `bootc install to-filesystem`.
+
+TIP: More information is available https://containers.github.io/bootc/bootc-install.html[at the upstream bootc site].
+
+In the very simplest example, assuming you have a running Linux environment
+with `podman`, you can perform a bare metal installation to a block device.
+Commonly, that existing Linux environment will be a "Live ISO" of some form.
+At the current time, in Fedora the most suitable default "Live ISO" is
+the https://docs.fedoraproject.org/en-US/fedora-coreos/live-booting/[Fedora CoreOS Live ISO].
+You can inject an Ignition configuration into the Live ISO which
+runs the following invocation via e.g. a systemd unit:
+
+[source]
+----
+$ podman run --rm --privileged --pid=host -v /var/lib/containers:/var/lib/containers --security-opt label=type:unconfined_t <image> bootc install to-disk /path/to/disk
+----
+
+==== More advanced installation with `bootc install to-filesystem`
+
+In this model, you can configure a target block device and root filesystem
+using whatever tools you want (e.g. LVM) and then run the same command above,
+except with `to-filesystem`:
+
+[source]
+----
+$ podman run --rm --privileged --pid=host -v /var/lib/containers:/var/lib/containers --security-opt label=type:unconfined_t <image> bootc install to-filesystem /path/to/mounted/fs
+----
+

@@ -1,0 +1,35 @@
+* xref:getting-started.adoc[Getting Started]
+* xref:base-images.adoc[Base images]
+* Building containers
+** xref:building-containers.adoc[Building derived container images]
+** xref:building-custom-base.adoc[Building custom base images]
+* Provisioning machines
+** xref:bare-metal.adoc[Installing on Bare Metal]
+** xref:podman-bootc-cli.adoc[Local virt testing with podman-bootc-cli]
+** xref:qemu-and-libvirt.adoc[Using generic libvirt and qemu]
+** xref:provisioning-aws.adoc[Installing on AWS]
+** xref:provisioning-vsphere.adoc[Installing on vSphere]
+** xref:provisioning-gcp.adoc[Installing on GCP (via OpenTofu)]
+** xref:linux-desktops.adoc[Linux desktops]
+* System Configuration
+** xref:authentication.adoc[Authentication, Users and Groups]
+** xref:storage.adoc[Configuring Storage]
+** xref:sysconfig-network-configuration.adoc[Network Configuration]
+** xref:running-containers.adoc[Running Containers]
+** xref:embedding-containers.adoc[Embedding Containers]
+** xref:hostname.adoc[Setting a Hostname]
+** xref:proxy.adoc[Proxied Internet Access]
+** xref:kernel-args.adoc[Modifying Kernel Arguments]
+** xref:initramfs.adoc[The initial RAM disk (initrd)]
+** xref:sysctl.adoc[Kernel Tuning]
+** xref:sysconfig-setting-keymap.adoc[Setting Keyboard Layout]
+** xref:counting.adoc[Node counting]
+* OS updates
+** xref:auto-updates.adoc[Auto-Updates]
+** xref:disconnected-updates.adoc[Disconnected/offline updates]
+** xref:bootloader-updates.adoc[Bootloader Updates]
+* Troubleshooting
+** xref:manual-rollbacks.adoc[Manual Rollbacks]
+** xref:access-recovery.adoc[Access Recovery]
+* Projects documentation
+** https://github.com/containers/bootc[bootc]

@@ -1,0 +1,11 @@
+= Setting Keyboard Layout
+
+To set your system keyboard layout (keymap), write to `/etc/vconsole.conf`:
+
+[source,text]
+----
+# /etc/vconsole.conf
+KEYMAP=de
+----
+
+Once booted, you can also verify that the desired keymap has been set using `localectl`.

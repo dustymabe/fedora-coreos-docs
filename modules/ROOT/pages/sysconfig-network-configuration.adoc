@@ -1,0 +1,143 @@
+= Host Network Configuration
+
+== Host Network Configuration Options
+
+=== Background
+
+The default `full` images include `NetworkManager`.  Unless otherwise configured, Fedora bootc will attempt DHCP on every interface with a cable plugged in.
+
+However,if you need to use static addressing or more complex networking (vlans, bonds, bridges, teams, etc..), you can do so in a number of ways which are summarized below. Regardless of the way you choose to configure networking it all ends up as configuration for NetworkManager, which takes the form of NetworkManager keyfiles. More information on the keyfile format can be found https://networkmanager.dev/docs/api/latest/nm-settings-keyfile.html[here]. More information on the subsection options for keyfiles can be found https://networkmanager.dev/docs/api/latest/ref-settings.html[here].
+
+=== Configuration Options
+
+Complex networking configuration often also requires *per-machine* state.  It is of course
+possible to generate machine-specific container images that have e.g. static IP addressing
+included.  Another pattern is to include code to *generate* network configuration from
+inside the image by inspecting the host's MAC address.
+
+==== Via Anaconda
+
+It is supported to use Anaconda kickstart support to configure networking for bare metal installations.
+
+Note that these will generally be stored in `/etc/NetworkManager/system-connections/`, and
+be inherently per-machine state.
+
+==== via Kernel Arguments
+
+On the first boot of a machine a user can provide kernel arguments that define networking configuration. These kernel arguments are mostly defined in the https://man7.org/linux/man-pages/man7/dracut.cmdline.7.html[dracut.cmdline man page]. There are a few different ways to apply these kernel arguments on first boot.
+
+When using `bootc install`, it is also possible to set per-machine kernel arguments via `--karg`.
+
+=== Generating NetworkManager Keyfiles using `nm-initrd-generator`
+
+NetworkManager ships a tool, https://networkmanager.dev/docs/api/latest/nm-initrd-generator.html[nm-initrd-generator], that can generate keyfiles from dracut kernel argument syntax. This might be a good way to either convert from kernel arguments to keyfiles or to just quickly generate some keyfiles giving a small amount of input and then tweak some more detailed settings.
+
+Here's an example of generating keyfiles for a bond via `nm-initrd-generator`:
+
+[source,bash,subs="attributes"]
+----
+$ podman run --rm -ti {container-c9s} /usr/libexec/nm-initrd-generator -s -- "ip=bond0:dhcp bond=bond0:ens2,ens3:mode=active-backup,miimon=100 nameserver=8.8.8.8"
+
+*** Connection 'bond0' ***
+
+[connection]
+id=bond0
+uuid=643c17b5-b364-4137-b273-33f450a45476
+type=bond
+interface-name=bond0
+multi-connect=1
+permissions=
+
+[ethernet]
+mac-address-blacklist=
+
+[bond]
+miimon=100
+mode=active-backup
+
+[ipv4]
+dns=8.8.8.8;
+dns-search=
+may-fail=false
+method=auto
+
+[ipv6]
+addr-gen-mode=eui64
+dns-search=
+method=auto
+
+[proxy]
+
+*** Connection 'ens3' ***
+
+[connection]
+id=ens3
+uuid=b42cc917-fd87-47df-9ac2-34622ecddd8c
+type=ethernet
+interface-name=ens3
+master=643c17b5-b364-4137-b273-33f450a45476
+multi-connect=1
+permissions=
+slave-type=bond
+
+[ethernet]
+mac-address-blacklist=
+
+*** Connection 'ens2' ***
+
+[connection]
+id=ens2
+uuid=e111bb4e-3ee3-4612-afc2-1d2dfff97671
+type=ethernet
+interface-name=ens2
+master=643c17b5-b364-4137-b273-33f450a45476
+multi-connect=1
+permissions=
+slave-type=bond
+
+[ethernet]
+mac-address-blacklist=
+----
+
+This run generates three keyfiles. One for `bond0`, one for `ens3`, and one for `ens2`. You can take the generated output, add more settings or tweak existing settings,
+and then commit the files into a container image.
+
+=== Configuring a Static IP
+
+==== Dracut Kernel Arguments
+
+.Template
+[source, bash]
+----
+ip=${ip}::${gateway}:${netmask}:${hostname}:${interface}:none:${nameserver}
+----
+
+.Rendered
+[source, bash]
+----
+ip=10.10.10.10::10.10.10.1:255.255.255.0:myhostname:ens2:none:8.8.8.8
+----
+
+==== Writing config
+
+It's recommended to store NetworkManager configuration embedded
+in container images in
+`/usr/share/NetworkManager/system-connections/` because
+this forms part of the immutable image state.
+
+You can also write configuration to `/etc/NetworkManager/system-connections/`
+as part of the container image; the default OSTree "3 way merge" will
+apply with any machine-specific configuration.
+
+=== Disabling Automatic Configuration of Ethernet Devices
+
+By default, NetworkManager will attempt to autoconfigure (DHCP/SLAAC) on every interface with a cable plugged in. In some network environments this may not be desirable. It's possible to change this behavior of NetworkManager with a configuration file dropin to e.g. `/usr/lib/NetworkManager/conf.d/noauto.conf`
+
+.Disable NetworkManager autoconfiguration of ethernet devices
+[source,text]
+----
+[main]
+# Do not do automatic (DHCP/SLAAC) configuration on ethernet devices
+# with no other matching connections.
+no-auto-default=*
+----

@@ -1,0 +1,13 @@
+# Automatically modified by update-versions.py; comments will not be preserved
+
+name: fedora-bootc
+title: Fedora bootc
+version: master
+start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/nav.adoc
+asciidoc:
+  attributes:
+    container-c9s: quay.io/centos-bootc/centos-bootc:stream9
+    container-fedora-full: registry.gitlab.com/bootc-org/fedora-bootc/base-images-experimental/fedora-bootc-full:40
+    container-fedora-minimal: registry.gitlab.com/bootc-org/fedora-bootc/base-images-experimental/fedora-bootc-minimal:40
