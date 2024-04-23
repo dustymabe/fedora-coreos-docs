@@ -1,0 +1,19 @@
+= Installing Fedora bootc on Bare Metal
+
+This guide provides instructions to install Fedora bootc to bare metal. Three options are available:
+
+* Installing from Anaconda
+* Installing from the container
+
+== Prerequisite
+
+Before installing Fedora bootc, it's recommended that you have created a customized derived container image;
+but this is not a hard requirement.
+
+Fedora bootc can be installed using https://anaconda-installer.readthedocs.io/en/latest/[Anaconda].
+
+== Installing from the network
+
+The `ostreecontainer` kickstart verb can be used to provision your custom container image.
+
+<https://pykickstart.readthedocs.io/en/latest/kickstart-docs.html#ostreecontainer>

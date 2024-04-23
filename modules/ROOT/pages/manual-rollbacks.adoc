@@ -1,0 +1,32 @@
+= Manual Rollbacks
+
+When an update is complete, the previous OS deployment remains on disk. If an update causes issues, you can use it as a fallback. 
+By default, this is a manual operation, but you can automate it.
+
+== Temporary rollback (interactive)
+
+To temporarily boot the previous OS deployment, hold down `Shift` during the OS boot process. When the bootloader menu appears, select the relevant OS entry in the menu.
+
+== Reverting via CLI/script
+
+To cause the previous OS deployment to be the next boot:
+
+[source,bash]
+----
+# Mark the previous OS deployment as the default, and immediately reboots into it
+bootc rollback
+----
+
+Please note that the default `bootc-fetch-apply-updates.timer` will keep looking for updates and upgrade to any new available OS deployment, other than the one you just reverted.
+
+If you prefer, you can temporarily turn off auto-updates. Later on, you can re-enable them in order to let the machine catch up with the usual flow of updates:
+
+[source,bash]
+----
+systemctl disable --now bootc-fetch-apply-updates.timer
+
+[...]
+
+# At a later point, re-enable it to track updates to your container image.
+systemctl enable --now bootc-fetch-apply-updates.timer
+----
