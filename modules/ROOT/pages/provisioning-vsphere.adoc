@@ -1,0 +1,78 @@
+= Provisioning Fedora bootc on vSphere
+
+== Prerequisites
+
+You will need the https://github.com/vmware/govmomi/tree/main/govc[govc] tool.
+
+== No cloud-init or hypervisor-specific metadata tools included by default
+
+include::cloud-agents-note.adoc[]
+
+== Generating a container image that includes agents
+
+This example container build injects both `open-vm-tools` and `cloud-init`,
+so that SSH credentials can be injected per virtual machine instantiation.
+
+[source]
+----
+FROM <base image>
+RUN dnf install -y open-vm-tools cloud-init && dnf clean all && rm -rf /var/cache /var/log/dnf && \
+    systemctl enable vmtoolsd.service
+----
+
+Include the additional software or tooling you want in your image as well; see
+xref:building-containers.adoc[Building containers].
+
+== Generating a VMDK with bootc-image-builder
+
+This uses https://github.com/osbuild/bootc-image-builder[bootc-image-builder]:
+
+[source]
+----
+$ podman run --rm -it --privileged -v /var/lib/containers/storage:/var/lib/containers/storage -v .:/output --security-opt label=type:unconfined_t \
+  --pull newer quay.io/centos-bootc/bootc-image-builder --local --type vmdk <your container image>
+----
+
+The generated VMDK file will be present in `vmdk/disk.vmdk`.
+
+== Uploading the VMDK
+
+[source]
+----
+govc import.vmdk \
+    -dc="${DATACENTER}" \
+    -ds="${DATASTORE}" \
+    -pool="${DATACENTER_POOL}" \
+    vmdk/disk.vmdk \
+    ${DESTINATION_FOLDER}
+----
+
+== Creating a new virtual machine from the VMDK
+
+[source]
+----
+govc vm.create \
+    -dc="${DATACENTER}" \
+    -ds="${DATASTORE}" \
+    -pool="{DATACENTER_POOL}" \
+    -net="${NETWORK}" \
+    -disk.controller=pvscsi \
+    -on=false \
+    -c=${CPUS} \
+    -m=${MEMORY} \
+    -g="rhel9_64Guest" \
+    -firmware="${FIRMWARE}" \
+    "${VM_NAME}"
+----
+
+== Attach the VMDK to the VM
+
+[source]
+----
+govc vm.disk.attach \
+    -dc="${DATACENTER}" \
+    -ds="${DATASTORE}" \
+    -vm="${VM_NAME}" \
+    -link=false \
+    -disk="${DESTINATION_FOLDER}/disk.vmdk"
+----

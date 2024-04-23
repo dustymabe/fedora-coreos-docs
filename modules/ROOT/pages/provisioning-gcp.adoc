@@ -1,0 +1,120 @@
+= Provisioning Fedora bootc on GCP
+
+This guide shows how to provision new Fedora/CentOS bootc instances on the
+https://cloud.google.com/products/compute[Google Compute Engine] platform.
+
+== Prerequisites
+
+You'll need a Google Compute Engine account, and if following this full example, also https://opentofu.org/[OpenTofu].
+To be clear, the OpenTofu usage is just an example, you can provision instances
+however you like, including the https://cloud.google.com/sdk/gcloud[gcloud CLI]
+interactively in the console GUI, or in a Kubernetes environment
+using https://cluster-api.sigs.k8s.io/[Cluster API], etc.
+
+== No cloud-init or hypervisor-specific metadata tools included by default
+
+include::cloud-agents-note.adoc[]
+
+In particular for Google Compute Engine, this means that the base image
+does *not* integrate with https://cloud.google.com/compute/docs/oslogin[OSLogin] by
+default.
+
+== No separate pre-generated disk images
+
+At the current time, the Fedora bootc project does not produce pre-built disk images
+for the base images.
+
+=== bootc-image-builder: Does not support GCP yet
+
+The https://github.com/osbuild/bootc-image-builder/[bootc-image-builder] tool does
+not yet support generating GCP disk images (however, this would be relatively
+easy to fix).
+
+== Example provisioning with OpenTofu and `bootc install to-existing-root`
+
+This is effectively a variant of the xref:provisioning-aws[AWS example]
+that uses the `aws` CLI in concert with `bootc install to-existing-root`,
+except instead of the CLI tool we are using https://opentofu.org/[OpenTofu]
+to more fully automate provisioning.
+
+Copy and modify the following code:
+
+.main.tf
+[,terraform]
+----
+provider "google" {
+  project = var.project
+  region  = var.region
+  zone = var.region_zone
+}
+
+resource "google_compute_instance" "bootc_test" {
+  name         = "bootc-test"
+  machine_type = "e2-standard-4"
+  tags = ["bootc-test"]
+  allow_stopping_for_update = true
+
+  boot_disk {
+    initialize_params {
+      # This instance uses the default RHEL 9 as a "launcher image"
+      image = "rhel-cloud/rhel-9"
+    }
+  }
+
+  # LOOK HERE
+  # This is really the main interesting thing going on; we're injecting a "startup script"
+  # via GCE instance metadata into the stock RHEL-9 guest image.  This script fetches our
+  # target container image, and reboots into it - *taking over* the existing instance.
+  metadata_startup_script = <<-EOS
+dnf -y install podman && podman run --rm --privileged -v /dev:/dev -v /:/target --pid=host --security-opt label=type:unconfined_t ${var.bootc_image} bootc install to-existing-root && reboot
+EOS
+
+  network_interface {
+    # A default network is created for all GCP projects
+    network = "default"
+    access_config {
+    }
+  }
+----
+
+.variables.tf
+[,terraform]
+----
+variable "project" {
+  type = string
+  description = "Your GCP project ID"
+}
+
+variable "region" {
+  type = string
+  description = "GCP region"
+  default = "us-central1"
+}
+
+variable "region_zone" {
+  type = string
+  description = "GCP region and zone"
+  default = "us-central1-f"
+}
+
+# This is the new important variable!  It will be injected into the startup
+# script; see `provision.tf`.
+variable "bootc_image" {
+  type = string
+  description = "Your bootable container"
+}
+----
+
+You will need to perform basic replacements in `vars.tf`, including
+at a minimum your desired container image.  But it is almost
+certain that you will want to modify `main.tf` to include it
+as part of a more substatial workload that may include network firewalls
+or routers, etc.
+
+Once you are ready, follow the https://opentofu.org/docs/intro/core-workflow/[OpenTofu workflow]
+to provision and update the system.
+
+TIP: OpenTofu is a good tool to manage cloud-level infrastructure.  However,
+once you want to make changes to the operating system itself, you can
+use a fully container-native workflow - just push changes to the registry
+and the instances will update in place.

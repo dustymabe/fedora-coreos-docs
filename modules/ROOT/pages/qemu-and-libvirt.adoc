@@ -1,0 +1,82 @@
+= Provisioning with qemu and libvirt
+
+First, use the https://github.com/osbuild/bootc-image-builder[bootc-image-builder]
+project to make a `.raw` or `.qcow2` disk image from your container
+image.
+
+NOTE: The default base image does not have any default credentials.  If you
+have not configured any, you will not be able to log into the virtual
+machine.  See xref:authentication.adoc[Authentication] as well as xref:building-containers.adoc[Building containers]
+for more information.
+
+== Example bootc-image-builder invocation
+
+[source]
+----
+podman run \
+    --rm \
+    -it \
+    --privileged \
+    --pull=newer \
+    --security-opt label=type:unconfined_t \
+    -v $(pwd)/output:/output \
+    quay.io/centos-bootc/bootc-image-builder:latest \
+    --type qcow2 \
+    <your container image here>
+----
+
+(Note that there are more options, such as including a `config.json` which
+ can inject users and SSH keys)
+
+== libvirt
+
+The https://libvirt.org/[libvirt] project is supported on
+several platforms but is very common on Linux environments.
+
+Here is a very simplified example `virt-install` invocation:
+
+[source]
+----
+virt-install \
+    --name fedora-bootc \
+    --cpu host \
+    --vcpus 4 \
+    --memory 4096 \
+    --import --disk ./output/qcow2/disk.qcow2,format=qcow2 \
+    --os-variant fedora-eln
+----
+
+More information about `virt-install` is available in its man page,
+as well as other places such as https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_and_managing_virtualization/assembly_creating-virtual-machines_configuring-and-managing-virtualization#creating-virtual-machines-using-the-command-line-interface_assembly_creating-virtual-machines[Red Hat Enterprise Linux documentation].
+ 
+== qemu
+
+Using "raw" qemu in some cases gives more control than higher level tools
+such as `libvirt`, but introduces architecture and platform specifics.
+
+=== qemu-system-x86_64 (Linux)
+
+```
+qemu-system-x86_64 \
+    -M accel=kvm \
+    -cpu host \
+    -smp 2 \
+    -m 4096 \
+    -bios /usr/share/OVMF/OVMF_CODE.fd \
+    -serial stdio \
+    -snapshot output/qcow2/disk.qcow2
+```
+
+=== qemu (MacOS, ARM/aarch64)
+
+```
+qemu-system-aarch64 \
+    -M accel=hvf \
+    -cpu host \
+    -smp 2 \
+    -m 4096 \
+    -bios /opt/homebrew/Cellar/qemu/8.1.3_2/share/qemu/edk2-aarch64-code.fd \
+    -serial stdio \
+    -machine virt \
+    -snapshot output/qcow2/disk.qcow2
+```

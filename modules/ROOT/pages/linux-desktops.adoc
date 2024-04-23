@@ -1,0 +1,27 @@
+= Linux desktops and Fedora bootc
+
+This project is generally datacenter/server/edge focused.
+However, there exist other projects which are using
+similar technologies and are focused on Linux desktops.
+
+In the future, it is likely that some of these projects
+will "rebase" on Fedora bootc as a common basis technology.
+
+== Fedora Atomic Desktops
+
+See https://fedoraproject.org/wiki/SIGs/AtomicDesktops[Fedora Atomic Desktops].
+
+Notable differences/overlaps:
+
+- Fedora bootc and Fedora Atomic Desktops both use Anaconda.
+- Fedora Atomic Desktops do not currently default to using containers for updates, but the legacy OSTree model
+- Fedora Atomic Desktops do not use `composefs`, and do not use `bootupd`, and have a slightly different filesystem layout
+
+== Universal Blue
+
+The https://universal-blue.org/[Universal Blue] project is heavily focused on container-native
+Linux desktops.
+
+There is a lot of similarity to the Atomic Desktops, except that the default update
+mechanism is containers, not OSTree.
+

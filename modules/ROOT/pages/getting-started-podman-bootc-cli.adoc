@@ -17,3 +17,10 @@ Other useful commands include:
 - `podman-bootc ssh`
 - `podman-bootc rm`
 
+TIP: The `podman-bootc` command can also directly run your custom derived container images!
+
+```
+$ podman-bootc run quay.io/exampleuser/mycustom-image:latest
+```
+
+See xref:building-containers.adoc[Building derived container images].

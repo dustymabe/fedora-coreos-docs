@@ -20,13 +20,20 @@ For more information on configuration, refer to the documentation for xref:build
 
 == Quickstart
 
-=== Running as a container
+=== Inspecting as a container
 
 include::getting-started-container.adoc[]
 
+However, it is more interesting to make a custom derived container image, and
+run it.  See xref:building-containers.adoc[Building derived container images].
+
 === Booting on a local hypervisor
 
-include::getting-started-local-virt.adoc[]
+include::getting-started-podman-bootc-cli.adoc[Using podman-bootc-cli]
+
+=== Using Podman Desktop with the bootc extension
+
+See https://github.com/containers/podman-desktop-extension-bootc[Podman Desktop bootc].
 
 === Exploring the OS for the first time
 
@@ -39,11 +46,18 @@ If you set up an xref:authentication.adoc[SSH key], you can SSH into the VM and 
 ssh root@<ip address>
 ----
 
+Note that the `podman-bootc` CLI by default automatically invokes `ssh` in this way.
+
 === Key related projects
 
 - https://github.com/containers/bootc[bootc]
 - https://github.com/osbuild/bootc-image-builder[bootc-image-builder]
 - https://gitlab.com/bootc-org/podman-bootc-cli[podman-bootc-cli]
+- https://github.com/containers/podman-desktop-extension-bootc[podman-desktop-extension-bootc]
+
+Other projects:
+
+- https://github.com/cgwalters/osbuild-cfg
 
 Established key related and included projects:
 
